@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	smallurl "https://github.com/ck89/shortener"
 	"net/http"
+	urlshort "shortener/shorten"
 )
 
 func main() {
@@ -12,27 +12,29 @@ func main() {
 		"/goog": "https://google.com",
 		"/yah":  "https://yahoo.com",
 	}
-	handlerMap := smallurl.MapHandler(urls, failsafeMux())
+	handlerMap := urlshort.HandlerMap(urls, failsafeMux())
 
 	yml := `
-- path:/smallurl
-  url: "https://godoc.org/github.com/ck89/smallurl"
+- path: /smallurl
+  url: "https://github.com/gophercises/urlshort"
 - path: /smallurllast
-  url: "https://godoc.org/github.com/ck89/shortener/tree/"
+  url: "https://github.com/gophercises/urlshort/tree/final"
 `
-	handlerYaml, err := smallurl.HandlerYAML([]byte(yml), handlerMap)
+	fmt.Println(yml)
+	handlerYaml, err := urlshort.HandlerYAML([]byte(yml), handlerMap)
 	if err != nil {
 		fmt.Println("uh oh yaml not hanled")
 		panic(err)
 	}
 	fmt.Println("Listening on :9080")
-	http.ListenAndServe(":9080", handlerMap)
+	http.ListenAndServe(":9080", handlerYaml)
 
 }
 
 func failsafeMux() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", greeting)
+	return mux
 }
 func greeting(a http.ResponseWriter, b *http.Request) {
 	fmt.Println("Dear world here we come")
